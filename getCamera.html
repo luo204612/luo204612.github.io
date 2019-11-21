@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>摄像头拍照</title>
+</head>
+
+<body>
+    <input id="fileBtn" type="file" οnchange="upload('#fileBtn', '#img');" accept="image/*" capture="camera" />
+    <img src="" id="img" />
+    <div id="text"></div>
+    <script>
+        var upload = function (btn, imgBox) {
+            "use strict";
+            var $btn = document.querySelector(btn),
+                $imgBox = document.querySelector(imgBox),
+                file = $btn.files[0],
+                reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (e) {
+                $imgBox.setAttribute("src", e.target.result);
+                text.innerHTML = e.target.result
+                //调用其他操作
+            };
+        };
+
+    </script>
+</body>
+
+</html>

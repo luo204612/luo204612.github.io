@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style type="text/css">
+    </style>
+</head>
+
+<body onload="init()">
+
+    <script src="./js/three.js"></script>
+    <!-- cdn 性能检测器 -->
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+    <!-- cdn dat.GUI插件 -->
+    <script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
+    <!-- 控制器引入 -->
+    <!-- <script src="./controls/FirstPersonControls.js"></script> -->
+    <!-- 引入格式Loader -->
+    <script src="./loader/OBJLoader.js"></script>
+    <script src="./loader/MTLLoader.js"></script>
+    <script src="./loader/GLTFLoader.js"></script>
+
+
+    <script>
+        //声明一些全局变量
+        var renderer, camera, scene, light, stats
+
+        //初始化渲染器
+        function initRenderer() {
+            renderer = new THREE.WebGLRenderer(); //实例化渲染器
+            renderer.setSize(window.innerWidth, window.innerHeight); //设置宽和高
+            renderer.shadowMap.enabled = true;//渲染阴影
+            document.body.appendChild(renderer.domElement); //添加到dom
+        }
+
+        //初始化场景
+        function initScene() {
+            scene = new THREE.Scene(); //实例化场景
+        }
+
+        //初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000); //实例化相机
+            camera.position.set(0, 0, 200); //相机初始位置
+            camera.lookAt(new THREE.Vector3(0, 0, 0)) //相机朝向
+        }
+
+        //创建灯光
+        function initLight() {
+            //添加一个全局环境光
+            scene.add(new THREE.AmbientLight(0x222222, 1));
+        }
+
+        //插件
+        function initPlugin() {
+            stats = new Stats(); //声明性能检测插件
+            document.body.appendChild(stats.dom);
+
+
+            //实例化dat.GUI对象，将需要修改的配置添加对象中，并监听变化回调
+            var gui = new dat.GUI();
+            //创建一个对象，包含需要改变的量
+            var controls = {
+            };
+            //分组
+            //触发的函数
+            function updatePosition() {
+            }
+        }
+
+        //创建模型
+        function initMesh() {
+
+        }
+
+        //加载模型
+        function initLoader() {
+           
+        }
+
+        //创建控制器
+        var controls;
+        function initControls() {
+
+        }
+
+
+
+
+        //运行动画
+        function animate() {
+            renderer.clear();
+
+            requestAnimationFrame(animate); //循环调用函数
+            stats.update(); //更新性能插件
+
+            renderer.render(scene, camera); //渲染界面
+        }
+
+        function init() {
+            initRenderer();
+            initScene();
+            initCamera();
+            initMesh();
+            initLight();
+            initPlugin()
+            initLoader()
+            initControls();
+            animate();
+        }
+
+    </script>
+</body>
+
+</html>

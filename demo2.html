@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style type="text/css">
+        div#canvas-frame {
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            height: 600px;
+            background-color: #EEEEEE;
+        }
+    </style>
+</head>
+
+<body onload="init()">
+
+    <!-- cdn three.js -->
+    <script src="./js/three.js"></script>
+    <!-- cdn 性能检测器 -->
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+    <!-- cdn dat.GUI插件 -->
+    <script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
+
+    <script src="./controls/FirstPersonControls.js"></script>
+
+
+    <!-- 引入格式Loader -->
+    <script src="./loader/OBJLoader.js"></script>
+    <script src="./loader/MTLLoader.js"></script>
+    <script src="./loader/GLTFLoader.js"></script>
+
+
+    <script>
+        //声明一些全局变量
+        var renderer, camera, scene, light, pointLight, spotLight, group
+
+        THREE.BackSide
+
+        //声明调用性能检测插件
+        var stats = new Stats();
+        document.body.appendChild(stats.dom);
+
+
+
+        //初始化渲染器
+        function initRenderer() {
+            renderer = new THREE.WebGLRenderer(); //实例化渲染器
+            renderer.setSize(window.innerWidth, window.innerHeight); //设置宽和高
+            renderer.shadowMap.enabled = true;//渲染阴影
+            document.body.appendChild(renderer.domElement); //添加到dom
+            //声明相机控制器
+            // var control = new THREE.OrbitControls(camera, renderer.domElement);
+            //更新相机位置
+            // control.update();
+            // renderer.render(scene, camera);
+        }
+
+        //初始化场景
+        function initScene() {
+            scene = new THREE.Scene(); //实例化场景
+            // scene.rotation.set(Math.PI*20/180,0,0)
+        }
+
+        //初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000); //实例化相机
+            camera.position.set(-100, 50, 0);
+
+            // camera.rotation.set(0,0.1,0.1);
+            camera.lookAt(new THREE.Vector3(0, 50, 0))
+
+            controls = new THREE.FirstPersonControls(camera);
+            controls.lookSpeed = 0.2; //鼠标移动查看的速度
+            controls.movementSpeed = 20; //相机移动速度
+            controls.noFly = true;
+            controls.constrainVertical = true; //约束垂直
+            controls.verticalMin = 1.0;
+            controls.verticalMax = 2.0;
+            controls.lon = -100; //进入初始视角x轴的角度
+            controls.lat = 0; //初始视角进入后y轴的角度
+
+        }
+
+
+
+        //创建灯光
+        function initLight() {
+            //添加一个全局环境光
+            scene.add(new THREE.AmbientLight(0x222222, 1));
+
+            //平行光
+            // light = new THREE.DirectionalLight(0xffffff); //添加了一个白色的平行光
+            // light.position.set(-1, 1, 0)
+            // light.castShadow = true;
+            // light.shadow.camera.near = 0; //产生阴影的最近距离
+            // light.shadow.camera.far = 100; //产生阴影的最远距离
+            // light.shadow.camera.left = -50; //产生阴影距离位置的最左边位置
+            // light.shadow.camera.right = 50; //最右边
+            // light.shadow.camera.top = 50; //最上边
+            // light.shadow.camera.bottom = -50; //最下面
+
+            //点光源
+            pointLight = new THREE.PointLight(0xffffff,0.5)
+            pointLight.position.set(20, 50, 20)
+            scene.add(pointLight)
+            // pointLight.castShadow = true;
+            // pointLight.color.set(0x000000); //修改光照颜色
+            // pointLight.intensity = 1.5; //修改光的强度
+            // pointLight.distance = 50; //修改光的照射范围
+            // pointLight.decay = 20; //修改衰减度
+
+            // spotLight = new THREE.SpotLight(0xffffff); //创建一个白色光照
+            // spotLight.shadowCameraVisible = true
+            // spotLight.position.set(20, 20, 20);
+            // spotLight.castShadow = true;
+            // scene.add(spotLight);
+            //光照辅助
+            // debug = new THREE.CameraHelper(spotLight.shadow.camera);
+            // debug.name = "debug";
+            // scene.add(debug);
+
+        }
+
+        var table, testBox
+
+        //创建MTL加载器
+        var mtlLoader = new THREE.MTLLoader();
+        //设置文件路径
+        mtlLoader.setPath('./obj/');
+
+        mtlLoader.load('test.mtl', function (material) {
+            //创建OBJ加载器
+            var objLoader = new THREE.OBJLoader();
+            //设置当前加载的纹理
+            objLoader.setMaterials(material);
+            objLoader.setPath('./obj/');
+            objLoader.load('test.obj', function (object) {
+                //添加阴影
+                object.traverse(function (item) {
+                    if (item instanceof THREE.Mesh) {
+                        item.castShadow = true;
+                        item.receiveShadow = true;
+                    }
+                });
+                //缩放
+                object.position.set(0, 0, -300)
+                object.scale.set(1, 1, 1);
+                scene.add(object);
+            })
+        });
+
+
+        //创建模型
+        function initMesh() {
+
+            group = new THREE.Group()
+
+            var tableGeometry = new THREE.BoxGeometry(10, 0.1, 10)
+            var tableMaterial = new THREE.MeshLambertMaterial()
+            // var tableMaterial = new THREE.MeshNormalMaterial()
+            tableMaterial.color = new THREE.Color("white")
+            table = new THREE.Mesh(tableGeometry, tableMaterial)
+            group.add(table)
+            table.receiveShadow = true //开启接受阴影投射
+
+            var testBoxGeometry = new THREE.BoxGeometry(2, 2, 2)
+            var testBoxMaterial = new THREE.MeshLambertMaterial()
+            testBoxMaterial.color = new THREE.Color("red")
+            testBox = new THREE.Mesh(testBoxGeometry, testBoxMaterial)
+            group.add(testBox)
+            testBox.position.set(0, 1.05, 0)
+            testBox.castShadow = true //开启阴影
+            // spotLight.target = testBox
+
+            // var spriteMaterial = new THREE.SpriteMaterial({ color: 0xffffff });
+            // var sprite = new THREE.Sprite(spriteMaterial);
+            // scene.add(sprite);
+            // sprite.position.set(0, 5, 0)
+
+            // var starsGeometry = new THREE.Geometry();
+            // //生成一万个点的位置
+            // for (var i = 0; i < 10000; i++) {
+            //     var star = new THREE.Vector3();
+            //     //THREE.Math.randFloatSpread 在区间内随机浮动* - 范围 / 2 *到* 范围 / 2 *内随机取值。
+            //     star.x = THREE.Math.randFloatSpread(500);
+            //     star.y = THREE.Math.randFloatSpread(500);
+            //     star.z = THREE.Math.randFloatSpread(500);
+            //     starsGeometry.vertices.push(star);
+            // }
+            // var starMap = new THREE.TextureLoader().load('./star.png');
+            // var starsMaterial = new THREE.PointsMaterial({ size: 1, map: starMap });
+            // var starField = new THREE.Points(starsGeometry, starsMaterial);
+            // scene.add(starField);
+
+
+
+            scene.add(group)
+        }
+
+        var controls;
+        function initControls() {
+            console.log(camera)
+            controls = new THREE.FirstPersonControls(camera);
+            controls.lookSpeed = 0.1; //鼠标移动查看的速度
+            controls.movementSpeed = 30; //相机移动速度
+            controls.noFly = true;
+            controls.constrainVertical = true; //约束垂直
+            controls.verticalMin = 1.0;
+            controls.verticalMax = 2.0;
+            controls.lon = Math.PI; //进入初始视角x轴的角度
+            controls.lat = Math.PI*50/180; //初始视角进入后y轴的角度
+        }
+
+        function render() {
+
+            renderer.clear();
+            renderer.render(scene, camera);
+        }
+
+        var clock = new THREE.Clock();
+
+        //运行动画
+        function animate() {
+            render();
+            stats.update();
+
+            controls.update(clock.getDelta());
+            requestAnimationFrame(animate); //循环调用函数
+
+            //鼠标控制
+            // document.body.onmousedown = addEvent
+            // document.body.onmouseup = removeEvent
+
+            // group.rotation.y +=0.01
+
+            stats.update(); //更新性能插件
+
+            renderer.render(scene, camera); //渲染界面
+        }
+
+        //鼠标控制相机
+        function initControl() {
+            var dom = renderer.domElement;
+            //鼠标按下时获取到当前相机的位置，并求出当前相机距离原点的位置
+            var distance; //相机距离中心点的距离
+            var pan, tilt; //相机的水平角度和垂直角度
+            var downX, downY; //鼠标按下时的xy坐标
+            var matrix = new THREE.Matrix4(); //声明一个旋转矩阵
+
+            //绑定按下事件
+            dom.addEventListener("mousedown", function (e) {
+                distance = computeDistance(camera.position, new THREE.Vector3());
+                computePanTilt(camera.position);
+
+                downX = e.clientX;
+                downY = e.clientY;
+
+                //绑定移动事件
+                document.addEventListener("mousemove", move);
+
+                //绑定鼠标抬起事件
+                document.addEventListener("mouseup", up);
+            });
+
+            //鼠标移动事件
+            function move(e) {
+                var moveX = e.clientX;
+                var moveY = e.clientY;
+
+                //计算鼠标的偏移量当前相机的pan和tilt
+                var offsetX = moveX - downX;
+                var offsetY = moveY - downY;
+
+                var movePan = pan - offsetX / 3;
+                var moveTilt = tilt - offsetY;
+
+                //tilt的移动范围是90到-90度
+                if (moveTilt >= 90) {
+                    moveTilt = 89.99;
+                }
+
+                if (moveTilt <= -90) {
+                    moveTilt = -89.99;
+                }
+
+                //根据pan和tilt计算出当前的相机应该所在的位置
+                var p = computePosition(distance, movePan, moveTilt);
+                camera.position.set(p.x, p.y, p.z);
+                camera.lookAt(new THREE.Vector3());
+            }
+
+            //鼠标抬起事件
+            function up() {
+                //清楚绑定事件
+                document.removeEventListener("mousemove", move);
+                document.removeEventListener("mouseup", up);
+            }
+
+            //计算两点位置的距离
+            function computeDistance(vec1, vec2) {
+                return vec1.distanceTo(vec2);
+            }
+
+            //根据当前点到原点的线计算出到原点z轴正方向的pan和tilt的偏移量
+            function computePanTilt(position) {
+                //首先计算水平的偏移角度
+                pan = new THREE.Vector3(position.x, 0, position.z).angleTo(new THREE.Vector3(0, 0, 1));
+
+                pan = pan / Math.PI * 180;
+                if (position.x < 0) {
+                    pan = 360 - pan;
+                }
+
+                //计算垂直的偏移角度
+                tilt = new THREE.Vector3(position.x, 0, position.z).angleTo(position);
+
+                tilt = tilt / Math.PI * 180;
+                if (position.y > 0) {
+                    tilt = -tilt;
+                }
+            }
+
+            //根据pan和tilt 相机到原点的距离计算出相机当前所在的位置
+            function computePosition(distance, pan, tilt) {
+                //重置旋转矩阵
+                matrix.identity();
+
+                var v = new THREE.Vector3(0, 0, distance);
+
+                //根据pan和tilt修改旋转矩阵，注意顶点旋转计算需要按照xyz的顺序旋转
+
+                matrix.makeRotationX(tilt / 180 * Math.PI);
+                v.applyMatrix4(matrix);
+
+                matrix.makeRotationY(pan / 180 * Math.PI);
+                v.applyMatrix4(matrix);
+
+                //计算出当前相机的位置
+                return v;
+            }
+        }
+
+
+        function init() {
+            initRenderer();
+            initScene();
+            initCamera();
+            initMesh();
+            initLight();
+            initControls();
+            animate();
+        }
+
+
+
+        //实例化dat.GUI对象，将需要修改的配置添加对象中，并监听变化回调
+        var gui = new dat.GUI();
+        //创建一个对象，包含需要改变的量
+        var controls = {
+
+        };
+        //分组
+
+        //触发的函数
+        function updatePosition() {
+
+        }
+
+
+    </script>
+</body>
+
+</html>
