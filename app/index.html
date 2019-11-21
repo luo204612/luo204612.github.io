@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>摄像头测试</title>
     <style>
-        #imgBox img{
+        #imgBox img {
             width: 200px;
             display: block;
             margin: 20px;
@@ -16,33 +16,83 @@
 </head>
 
 <body>
+    <script src="js/recorder.js"></script>
+
     后置<input id="fileBtn" type="file" accept="image/*,video/*" capture="camera" />
     <div></div>
     前置<input id="userBtn" type="file" accept="image/*,video/*" capture="user" />
     <div id="imgBox"></div>
-    录音<input id="audioBtn" type="file" accept="audio/*" capture="" />
-    <div id="imgBox"></div>
+
+    <button id="start" class="ui-btn ui-btn-primary" disabled> 录音</button>
+    <button id="stop" class="ui-btn ui-btn-primary" disabled>停止</button>
+    <div id="audio-container"></div>
+
     <script>
+        //图片，视频加载
         var imgBox = document.getElementById("imgBox")
-        
-        
+        var fileBtn = document.getElementById("fileBtn")
+        var userBtn = document.getElementById("userBtn")
+
         var upload = function (event) {
             let file = event.target.files[0];
             let reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = function (e) {
-                let img = document . createElement("img")
+                let img = document.createElement("img")
                 img.src = e.target.result
                 imgBox.appendChild(img)
             };
         };
 
-        document.getElementById("fileBtn").onchange = upload
-        document.getElementById("userBtn").onchange = upload
-        document.getElementById("audioBtn").onchange = function(e){
-            alert(e)
-        }
+        fileBtn.onchange = upload
+        userBtn.onchange = upload
 
+
+        // 录音
+
+        var start = document.getElementById('start');
+        var stop = document.getElementById('stop');
+        var container = document.getElementById('audio-container');
+
+        window.onload = function () {
+            var recorder = new Recorder({
+                sampleRate: 44100, //采样频率，默认为44100Hz(标准MP3采样率)
+                bitRate: 128, //比特率，默认为128kbps(标准MP3质量)
+                success: function () {
+                    start.disabled = false;
+                },
+                error: function (msg) {
+                    alert(msg);
+                },
+                fix: function (msg) {
+                    alert(msg);
+                }
+            });
+
+            start.onclick = function () {
+                this.disabled = true;
+                stop.disabled = false;
+                var audio = document.querySelectorAll('audio');
+                for (var i = 0; i < audio.length; i++) {
+                    if (!audio[i].paused) {
+                        audio[i].pause();
+                    }
+                }
+                recorder.start();
+            }
+
+            stop.onclick = function () {
+                this.disabled = true;
+                start.disabled = false;
+                recorder.stop();
+                recorder.getBlob(function (blob) {
+                    var audio = document.createElement('audio');
+                    audio.src = URL.createObjectURL(blob);
+                    audio.controls = true;
+                    container.appendChild(audio);
+                });
+            }
+        };
     </script>
 </body>
 
