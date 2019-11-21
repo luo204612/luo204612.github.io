@@ -20,6 +20,8 @@
     <div></div>
     前置<input id="userBtn" type="file" accept="image/*,video/*" capture="user" />
     <div id="imgBox"></div>
+    录音<input id="audioBtn" type="file" accept="audio/*" capture="" />
+    <div id="imgBox"></div>
     <script>
         var imgBox = document.getElementById("imgBox")
         
@@ -37,6 +39,9 @@
 
         document.getElementById("fileBtn").onchange = upload
         document.getElementById("userBtn").onchange = upload
+        document.getElementById("audioBtn").onchange = function(e){
+            alert(e)
+        }
 
     </script>
 </body>
