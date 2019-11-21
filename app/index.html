@@ -16,11 +16,15 @@
 </head>
 
 <body>
-    <input id="fileBtn" type="file" accept="image/*,video/*" capture="camera" />
+    后置<input id="fileBtn" type="file" accept="image/*,video/*" capture="camera" />
+    <div></div>
+    前置<input id="userBtn" type="file" accept="image/*,video/*" capture="user" />
     <div id="imgBox"></div>
     <script>
         var imgBox = document.getElementById("imgBox")
-        document.getElementById("fileBtn").onchange = function (event) {
+        
+        
+        var upload = function (event) {
             let file = event.target.files[0];
             let reader = new FileReader();
             reader.readAsDataURL(file);
@@ -30,6 +34,9 @@
                 imgBox.appendChild(img)
             };
         };
+
+        document.getElementById("fileBtn").onchange = upload
+        document.getElementById("userBtn").onchange = upload
 
     </script>
 </body>
