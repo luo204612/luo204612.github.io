@@ -93,12 +93,12 @@
 
 <body>
     <script src="./js/recorder.js"></script>
-
+    <p>摄像头采集</p>
     后置<input id="fileBtn" type="file" accept="image/*,video/*" capture="camera" />
     <div></div>
     前置<input id="userBtn" type="file" accept="image/*,video/*" capture="user" />
     <div id="imgBox"></div>
-
+    <p>录音</p>
     <button id="start" class="ui-btn ui-btn-primary" disabled> 录音</button>
     <button id="stop" class="ui-btn ui-btn-primary" disabled>停止</button>
     <div id="audio-container"></div>
@@ -136,6 +136,7 @@
                 bitRate: 128, //比特率，默认为128kbps(标准MP3质量)
                 success: function () {
                     start.disabled = false;
+                    console.log(123)
                 },
                 error: function (msg) {
                     alert(msg);
