@@ -20,6 +20,9 @@
         document.body.on('touchmove', function (event) {
             event.preventDefault();
         })
+        document.body.addEventListener('touchmove', bodyScroll, false);
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
     </script>
     <script src="https://cdn.jsdelivr.net/npm/p5"></script>
     <script src="./js/sketch.js"></script>
