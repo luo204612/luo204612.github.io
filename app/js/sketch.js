@@ -37,7 +37,7 @@ function between2(num, a, b) {
 
 
 function setup() {
-    createCanvas(800, 800);
+    createCanvas(300, 500);
     background(255);
 }
 
