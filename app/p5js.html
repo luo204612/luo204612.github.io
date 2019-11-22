@@ -18,15 +18,15 @@
     </style>
 </head>
 
-<body ontouchmove="event.preventDefault()"  >
+<body ontouchmove="event.preventDefault()">
     <script>
-        document.body.addEventListener('touchmove', function (event) {
-            event.preventDefault();
-        })
-        document.ontouchmove = function (e) {
-            e.preventDefault();
-        }
-        document.body.addEventListener('touchmove', bodyScroll, false);  
+        $(document).ready(function () {
+            function stopScrolling(touchEvent) {
+                touchEvent.preventDefault();
+            }
+            document.addEventListener('touchstart', stopScrolling, false);
+            document.addEventListener('touchmove', stopScrolling, false);
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/p5"></script>
     <script src="./js/sketch.js"></script>
