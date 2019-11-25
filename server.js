@@ -3,7 +3,7 @@ var app = express()
 
 app.use(express.static('app'));
 
-app.listen(8080,"192.168.1.109",()=>{
+app.listen(8080,()=>{
     console.log("server is running")
 })
 
