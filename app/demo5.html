@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style type="text/css">
+        .modelBox {
+            width: 100%;
+            height: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .btn {
+            width: 100px;
+            height: 50px;
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            margin-left: -50px;
+            background: chocolate;
+            text-align: center;
+            line-height: 50px;
+            font-size: 25px;
+            border-radius: 10%;
+            display: none;
+        }
+    </style>
+</head>
+
+<body onload="init()">
+
+    <div class="modelBox">
+        <div class="btn" onclick="boom()"></div>
+    </div>
+
+    <script src="./js/three.js"></script>
+    <!-- cdn 性能检测器 -->
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+    <!-- cdn dat.GUI插件 -->
+    <script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
+    <!-- TweenMax 插针动画插件 -->
+    <script src="./js/TweenMax.min.js"> </script>
+    <!-- 控制器引入 -->
+    <script src="./controls/OrbitControls.js"></script>
+    <!-- 引入格式Loader -->
+    <script src="./loader/OBJLoader.js"></script>
+    <script src="./loader/MTLLoader.js"></script>
+    <script src="./loader/GLTFLoader.js"></script>
+
+
+    <script>
+        //声明一些全局变量
+        var renderer, camera, scene, light, stats
+        var modelBox = document.getElementsByClassName("modelBox")[0]
+        var btn = document.getElementsByClassName("btn")[0]
+        console.log(modelBox.offsetWidth)
+        //初始化渲染器
+        function initRenderer() {
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, }); //实例化渲染器
+            renderer.setSize(modelBox.clientWidth, modelBox.clientHeight); //设置宽和高
+            renderer.shadowMap.enabled = true;//渲染阴影
+            modelBox.appendChild(renderer.domElement); //添加到dom
+        }
+
+        //初始化场景
+        function initScene() {
+            scene = new THREE.Scene(); //实例化场景
+        }
+
+        //初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, modelBox.clientWidth / modelBox.clientHeight, 1, 1000); //实例化相机
+            camera.position.set(0, 0, 400); //相机初始位置
+            camera.lookAt(new THREE.Vector3(0, 0, 0)) //相机朝向
+        }
+
+        //创建灯光
+        function initLight() {
+            //添加一个全局环境光
+            scene.add(new THREE.AmbientLight(0x222222, 0.1));
+            light = new THREE.PointLight(0xffffff, 0.5)
+            light.position.set(100, 100, 100)
+            scene.add(light)
+            light2 = new THREE.PointLight(0xffffff, 0.5)
+            light2.position.set(0, -100, 0)
+            scene.add(light2)
+
+        }
+
+        //插件
+        function initPlugin() {
+        //     stats = new Stats(); //声明性能检测插件
+        //     document.body.appendChild(stats.dom);
+
+
+        //     //实例化dat.GUI对象，将需要修改的配置添加对象中，并监听变化回调
+        //     var gui = new dat.GUI();
+        //     //创建一个对象，包含需要改变的量
+        //     var controls = {
+
+        //     };
+        //     //分组
+        //     //触发的函数
+        //     function updatePosition() {
+        //     }
+        }
+
+        var mesh
+        //创建模型
+        function initMesh() {
+        }
+
+        var myObj
+        //加载模型
+        function initLoader() {
+            var mtlLoader = new THREE.MTLLoader()
+                .setPath('./obj/')
+                .load('渲染文件.mtl', function (material) { //创建OBJ加载器
+                    var objLoader = new THREE.OBJLoader();
+                    //设置当前加载的纹理
+                    objLoader.setMaterials(material);
+                    objLoader.setPath('./obj/');
+                    objLoader.load('1115.obj', function (object) {
+                        //添加阴影
+                        object.traverse(function (item) {
+                            if (item instanceof THREE.Mesh) {
+                                item.castShadow = true;
+                                item.receiveShadow = true;
+                            }
+                        });
+                        //缩放
+                        myObj = object
+                        btn.style.display = "block"
+                        var materialhongmu = new THREE.TextureLoader().load("./static/hongmu.jpg");
+                        var materialshamu = new THREE.TextureLoader().load("./static/shamu.jpg");
+                        var materialshu = new THREE.TextureLoader().load("./static/书.jpg");
+                        var materialying = new THREE.TextureLoader().load("./static/ying.jpg");
+                        var hongmu = new THREE.MeshBasicMaterial(); //创建材质
+                        var shamu = new THREE.MeshBasicMaterial(); //创建材质
+                        var shu = new THREE.MeshBasicMaterial(); //创建材质
+                        var ying = new THREE.MeshBasicMaterial(); //创建材质
+                        hongmu.map = materialhongmu
+                        shamu.map = materialshamu
+                        shu.map = materialshu
+                        ying.map = materialying
+                        myObj.children[0].material = ying
+                        myObj.children[1].material = hongmu
+                        myObj.children[7].material = hongmu
+                        myObj.children[8].material = shamu
+                        myObj.children[6].material = shu
+
+
+
+                        var materialJinshu = new THREE.MeshPhysicalMaterial({ color: 0xDAA520 }); //创建材质
+                        materialJinshu.reflectivity = 0.5
+                        myObj.children[2].material = materialJinshu
+                        myObj.children[3].material = materialJinshu
+
+                        var materialBoli = new THREE.MeshPhysicalMaterial({ color: 0x808080 }); //创建材质
+                        materialBoli.reflectivity = 1
+                        materialBoli.opacity = 0.3
+                        myObj.children[5].material = materialBoli
+                        myObj.children[5].geometry.opacity = 0.1
+
+                        material.needsUpdate = true
+                        scene.add(myObj);
+                    })
+                });
+        }
+
+        var isboom = false
+        //爆炸动画
+        function boom() {
+
+            var positionArr = [
+                { x: 0, y: -10, z: 0 },
+                { x: 0, y: 0, z: -50 },
+                { x: 0, y: -10, z: 50 },
+                { x: 0, y: 30, z: 0 },
+                { x: 0, y: 30, z: 0 },
+                { x: 0, y: 0, z: 50 },
+                { x: 0, y: -50, z: 0 },
+                { x: 0, y: -25, z: 0 }]
+            if (isboom == false) {
+                for (let i = 1; i <= positionArr.length; i++) {
+                    var myTween = new TweenMax(myObj.children[i].position, 2, positionArr[i - 1])
+                }
+                isboom = true
+            } else {
+                for (let i = 1; i <= positionArr.length; i++) {
+                    var myTween = new TweenMax(myObj.children[i].position, 2, { x: 0, y: 0, z: 0 })
+                }
+                isboom = false
+            }
+        }
+
+        //创建控制器
+        var controls;
+        function initControls() {
+            control = new THREE.OrbitControls(camera, renderer.domElement);
+        }
+        var mixer, clock = new THREE.Clock();
+        function render() {
+            control.update();
+            var time = clock.getDelta();
+            if (mixer) {
+                mixer.update(time);
+            }
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+
+        //运行动画
+        function animate() {
+            renderer.clear();
+
+
+            render();
+            requestAnimationFrame(animate); //循环调用函数
+
+            // stats.update(); //更新性能插件
+            // if (myObj)
+            scene.rotation.y += 0.01
+
+            renderer.render(scene, camera); //渲染界面
+        }
+
+        function init() {
+            initRenderer();
+            initScene();
+            initCamera();
+            initMesh();
+            initLight();
+            initPlugin()
+            initLoader()
+            initControls();
+            animate();
+            window.onresize = onWindowResize;
+        }
+
+    </script>
+</body>
+
+</html>
