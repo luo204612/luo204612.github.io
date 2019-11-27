@@ -83,7 +83,7 @@
 
         //初始化相机
         function initmycamera() {
-            mycamera = new THREE.PerspectiveCamera(45, modelBox.clientWidth / modelBox.clientHeight, 1, 1000); //实例化相机
+            mycamera = new THREE.PerspectiveCamera(60, modelBox.clientWidth / modelBox.clientHeight, 1, 1000); //实例化相机
             mycamera.position.set(0, -3, 50); //相机初始位置
             mycamera.lookAt(new THREE.Vector3(-10, 2, 0)) //相机朝向
         }
