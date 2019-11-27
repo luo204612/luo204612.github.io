@@ -37,7 +37,11 @@
         <div class="btn" onclick="boom()">boom</div>
     </div>
 
-    <script src="./js/three.min.js"></script>
+    <script src="./js/three.js"></script>
+    <!-- cdn 性能检测器 -->
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+    <!-- cdn dat.GUI插件 -->
+    <script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
     <!-- TweenMax 插针动画插件 -->
     <script src="./js/TweenMax.min.js"> </script>
     <!-- 控制器引入 -->
@@ -50,7 +54,7 @@
 
     <script>
         //声明一些全局变量
-        var renderer, camera, scene, light
+        var renderer, camera, scene, light, stats
         var modelBox = document.getElementsByClassName("modelBox")[0]
         var btn = document.getElementsByClassName("btn")[0]
         console.log(modelBox.offsetWidth)
@@ -89,7 +93,20 @@
 
         //插件
         function initPlugin() {
+        //     stats = new Stats(); //声明性能检测插件
+        //     document.body.appendChild(stats.dom);
 
+
+        //     //实例化dat.GUI对象，将需要修改的配置添加对象中，并监听变化回调
+        //     var gui = new dat.GUI();
+        //     //创建一个对象，包含需要改变的量
+        //     var controls = {
+
+        //     };
+        //     //分组
+        //     //触发的函数
+        //     function updatePosition() {
+        //     }
         }
 
         var mesh
