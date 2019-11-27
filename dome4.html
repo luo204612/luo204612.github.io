@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style type="text/css">
+        body {
+            background: black;
+        }
+
+        .modelBox {
+            width: 100%;
+            height: 800px;
+            margin: -10px auto;
+            position: relative;
+
+        }
+
+        :focus {
+            outline: black auto 1px;
+            outline-color: black;
+        }
+
+        video {
+            opacity: 0;
+            height: 0;
+        }
+    </style>
+</head>
+
+
+
+<body onload="init()">
+    <video id="video1" muted webkit-playsinline="true" 
+    playsinline="false" 
+    x5-video-player-type="h5" 
+    x5-video-player-fullscreen="false" >
+        <source src="./static/粒子向左.mp4">
+    </video>
+    <video id="video2" muted webkit-playsinline="true" 
+    playsinline="false" 
+    x5-video-player-type="h5" 
+    x5-video-player-fullscreen="false">
+        <source src="./static/粒子向右.mp4">
+    </video>
+    <video id="video3" muted webkit-playsinline="true" 
+    playsinline="false" 
+    x5-video-player-type="h5" 
+    x5-video-player-fullscreen="false">
+        <source src="./static/时钟20s.mp4">
+    </video>
+
+
+    <div class="modelBox">
+    </div>
+
+    <script src="./js/three.js"></script>
+
+    <!-- cdn 性能检测器 -->
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+    <!-- cdn dat.GUI插件 -->
+    <script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
+    <!-- TweenMax 插针动画插件 -->
+    <script src="./js/TweenMax.min.js"> </script>
+    <!-- 控制器引入 -->
+    <script src="./controls/OrbitControls.js"></script>
+    <script src="./controls/FirstPersonControls.js"></script>
+    <!-- 引入格式Loader -->
+    <script src="./loader/OBJLoader.js"></script>
+    <script src="./loader/MTLLoader.js"></script>
+    <script src="./loader/GLTFLoader.js"></script>
+
+
+    <script>
+
+
+        //声明一些全局变量
+        var renderer, mycamera, scene, light, stats, spotLight
+        var modelBox = document.getElementsByClassName("modelBox")[0]
+        var btn = document.getElementsByClassName("btn")[0]
+        console.log(modelBox.offsetWidth)
+        //初始化渲染器
+        function initRenderer() {
+            renderer = new THREE.WebGLRenderer({ alpha: false, antialias: true, }); //实例化渲染器
+            renderer.setSize(modelBox.clientWidth, modelBox.clientHeight); //设置宽和高
+            renderer.shadowMap.enabled = true;//渲染阴影
+            modelBox.appendChild(renderer.domElement); //添加到dom
+        }
+
+        //初始化场景
+        function initScene() {
+            scene = new THREE.Scene(); //实例化场景
+        }
+
+        //初始化相机
+        function initmycamera() {
+            mycamera = new THREE.PerspectiveCamera(45, modelBox.clientWidth / modelBox.clientHeight, 1, 1000); //实例化相机
+            mycamera.position.set(0, -3, 90); //相机初始位置
+            mycamera.lookAt(new THREE.Vector3(0, 2, 0)) //相机朝向
+        }
+
+        //创建灯光
+        function initLight() {
+            //添加一个全局环境光
+            scene.add(new THREE.AmbientLight(0x222222, 1));
+            // light = new THREE.PointLight(0xffffff, 0.5)
+            // light.position.set(0, 20, 20)
+            // scene.add(light)
+            spotLight = new THREE.SpotLight(0xffffff); //创建一个白色光照
+            spotLight.position.set(10, 15, 100)
+            spotLight.intensity = 15; //修改光的强度
+            spotLight.distance = 200; //修改光的照射范围
+            spotLight.angle = 0.7; //修改光的照射弧度
+            spotLight.penumbra = 1; //修改交界过渡
+            spotLight.decay = 1; //修改衰减度
+            spotLight.castShadow = true
+            scene.add(spotLight);
+
+
+
+            var pointLight = new THREE.PointLight(0xffffff); //创建一个白色的点光
+            scene.add(pointLight);
+            //添加灯光辅助
+
+            spotLightHelper = new THREE.PointLightHelper(pointLight);
+            scene.add(spotLightHelper);
+        }
+
+
+        //插件
+        function initPlugin() {
+
+        }
+
+        //创建MTL加载器
+        var objLoader = new THREE.OBJLoader();
+        var materialAnime
+        //设置当前加载的纹理
+        // objLoader.setMaterials(material);
+        objLoader.setPath('./obj/');
+        objLoader.load('929-边.obj', function (object) {
+
+            //缩放
+            materialAnime = new THREE.MeshBasicMaterial({ color: "black" })
+            object.children[0].material = materialAnime
+
+
+            object.position.set(-32.5, -15.5, 1)
+            object.scale.set(0.09, 0.09, 0.09);
+
+            scene.add(object);
+        })
+        var objLoader2 = new THREE.OBJLoader();
+        objLoader2.setPath('./obj/');
+        objLoader2.load('929-体块.obj', function (object) {
+            //缩放
+            var material1 = new THREE.MeshLambertMaterial({ color: "#020202" })
+            object.children[0].material = material1
+            object.position.set(-32.5, -15.5, 1)
+            object.scale.set(0.09, 0.09, 0.09);
+            scene.add(object);
+        })
+
+        var wall1, wall2, wall3, wall4, clockBtn
+        var leftMaterials = [];
+        var rightMaterials = [];
+        var midMaterials = [];
+
+        for (let i = 0; i < 6; i++) {
+            leftMaterials[i] = new THREE.MeshLambertMaterial({ color: 'grey' })
+            rightMaterials[i] = new THREE.MeshLambertMaterial({ color: 'grey' })
+            midMaterials[i] = new THREE.MeshLambertMaterial({ color: 'grey' })
+        }
+        //创建模型
+        function initMesh() {
+
+
+            var geometry = new THREE.BoxGeometry(65, 32, 2); //创建几何体
+
+            var left = document.getElementById('video1');
+            var leftTexture = new THREE.VideoTexture(left);
+            leftMaterials[4].map = leftTexture
+            var right = document.getElementById('video2');
+            var rightTexture = new THREE.VideoTexture(right);
+            rightMaterials[4].map = rightTexture
+
+            var mid = document.getElementById('video3');
+            var midTexture = new THREE.VideoTexture(mid);
+            midMaterials[4].map = midTexture
+
+            wall1 = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(leftMaterials)); //创建网格
+            scene.add(wall1); //将网格添加到场景
+
+            var geometry2 = new THREE.BoxGeometry(50, 32, 2); //创建几何体
+            wall2 = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(rightMaterials)); //创建网格
+            scene.add(wall2); //将网格添加到场景
+            wall2.position.set(-33.5, 0, 33.5)
+            wall2.rotation.set(0, Math.PI / 2, 0)
+
+            wall3 = new THREE.Mesh(geometry2, new THREE.MeshFaceMaterial(midMaterials)); //创建网格
+
+            scene.add(wall3); //将网格添加到场景
+            wall3.position.set(33.5, 0, 26)
+            wall3.rotation.set(0, -Math.PI / 2, 0)
+            wall1.castShadow = true
+            wall2.castShadow = true
+            wall3.castShadow = true
+
+
+            var material = new THREE.MeshLambertMaterial({ color: "#111111" }); //创建材质
+            var floorGeometry = new THREE.BoxGeometry(100, 100, 1); //创建几何体
+            wall4 = new THREE.Mesh(floorGeometry, material); //创建网格
+            wall4.receiveShadow = true
+            scene.add(wall4); //将网格添加到场景
+            wall4.position.set(0, -16.5, 30)
+            wall4.rotation.set(Math.PI / 2, 0, 0)
+
+            var clockGeo = new THREE.BoxGeometry(1, 5, 5); //创建几何体
+            clockBtn = new THREE.Mesh(clockGeo, material)
+            scene.add(clockBtn)
+            clockBtn.position.set(33.5, -2.5, 36.5)
+        }
+
+
+        var mouse = new THREE.Vector2();
+        //
+        function onDocumentMouseDown(e) {
+            e.preventDefault();
+
+            //将鼠标点击位置的屏幕坐标转成threejs中的标准坐标,具体解释见代码释义
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            //新建一个三维单位向量 假设z方向就是0.5
+            //根据照相机，把这个向量转换到视点坐标系
+            var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(mycamera);
+
+            //在视点坐标系中形成射线,射线的起点向量是照相机， 射线的方向向量是照相机到点击的点，这个向量应该归一标准化。
+            var raycaster = new THREE.Raycaster(mycamera.position, vector.sub(mycamera.position).normalize());
+            // var raycaster = new THREE.Raycaster()
+            // raycaster.setFromCamera( mouse, camera );
+
+            //射线和模型求交，选中一系列直线
+            var intersects = raycaster.intersectObject(clockBtn);
+            // console.log(intersects)
+
+            if (intersects.length > 0) {
+                //选中第一个射线相交的物体
+                // SELECTED = intersects[0].object;
+                // var intersected = intersects[0].object;
+                // console.log(intersects[0].object)
+                var videoArr = [video1, video2, video3]
+                for (let i of videoArr) {
+                    i.play()
+                }
+                var myTween = new TweenMax(materialAnime.color, 20, { r: 1, g: 1, b: 1 })
+                setTimeout(() => {
+                    var myTween2 = new TweenMax(materialAnime.color, 5, { r: 0, g: 0, b: 0 })
+                    for (let i of videoArr) {
+                        i.currentTime = 0
+                        i.pause()
+                    }
+                }, 20000)
+            }
+        }
+
+        document.onmousedown = onDocumentMouseDown
+        document.ontouchstart =function(){
+            var videoArr = [video1, video2, video3]
+                for (let i of videoArr) {
+                    i.play()
+                }
+        }
+
+        //创建控制器
+        var control3D
+        function init3DControls() {
+            control3D = new THREE.OrbitControls(mycamera, renderer.domElement);
+        }
+        var mixer, clock = new THREE.Clock();
+
+        function render3D() {
+            control3D.update();
+            var time = clock.getDelta();
+            if (mixer) {
+                mixer.update(time);
+            }
+            renderer.render(scene, mycamera);
+        }
+
+        var controlFrist;
+        function initFirstControls() {
+            controlFrist = new THREE.FirstPersonControls(mycamera);
+            controlFrist.lookSpeed = 0.1; //鼠标移动查看的速度
+            controlFrist.movementSpeed = 30; //相机移动速度
+            controlFrist.noFly = true;
+            controlFrist.constrainVertical = true; //约束垂直
+            controlFrist.verticalMin = 1.0;
+            controlFrist.verticalMax = 2.0;
+            controlFrist.lon = Math.PI; //进入初始视角x轴的角度
+            controlFrist.lat = Math.PI * 50 / 180; //初始视角进入后y轴的角度
+        }
+
+        function renderFirst() {
+            renderer.clear();
+            renderer.render(scene, mycamera);
+        }
+
+        
+        function onWindowResize() {
+            mycamera.aspect = window.innerWidth / window.innerHeight;
+            mycamera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+
+
+        function init() {
+            initRenderer();
+            initScene();
+            initmycamera();
+            initMesh();
+            initLight();
+            initPlugin()
+
+            var popw = confirm("第一人称视角？");
+            if (popw == true) {
+                // console.log(document.body.style.cursor = "none")
+                initFirstControls();
+                //运行动画
+                function animate() {
+                    renderer.clear();
+                    controlFrist.update(clock.getDelta());
+                    renderFirst();
+                    requestAnimationFrame(animate); //循环调用函数
+                    //更新光照辅助
+                    spotLightHelper.update();
+
+
+                    renderer.render(scene, mycamera); //渲染界面
+                }
+            }
+            else {
+                init3DControls();
+                function animate() {
+                    renderer.clear();
+                    render3D();
+                    requestAnimationFrame(animate); //循环调用函数
+                    //更新光照辅助
+                    spotLightHelper.update();
+                    renderer.render(scene, mycamera); //渲染界面
+                }
+            }
+
+            animate()
+            window.onresize = onWindowResize;
+
+        }
+
+    </script>
+
+</body>
+
+</html>

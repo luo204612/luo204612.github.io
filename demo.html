@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style type="text/css">
+        div#canvas-frame {
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            height: 600px;
+            background-color: #EEEEEE;
+        }
+    </style>
+</head>
+
+<body onload="init()">
+
+    <!-- cdn three.js -->
+    <script src="https://cdn.bootcss.com/three.js/r83/three.js"></script>
+    <!-- cdn 性能检测器 -->
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+    <!-- cdn dat.GUI插件 -->
+    <script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
+
+    <!-- 引入格式Loader -->
+    <script src="./OBJLoader.js"></script>
+    <script src="./MTLLoader.js"></script>
+    <script src="./GLTFLoader.js"></script>
+    <script src="./Stats.js"></script>
+    <script src="./test1.js"></script>
+
+    <script>
+        //声明一些全局变量
+        var renderer, camera, scene,light, mesh, circle, cone, cylinder, tours, lineGeometry
+
+        THREE.BackSide
+
+        //声明调用性能检测插件
+        var stats = new Stats();
+        document.body.appendChild(stats.dom);
+
+        //初始化渲染器
+        function initRenderer() {
+            renderer = new THREE.WebGLRenderer(); //实例化渲染器
+            renderer.setSize(window.innerWidth, window.innerHeight); //设置宽和高
+            document.body.appendChild(renderer.domElement); //添加到dom
+        }
+
+        //初始化场景
+        function initScene() {
+            scene = new THREE.Scene(); //实例化场景
+        }
+
+        //初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 200); //实例化相机
+            camera.position.set(0, 0, 15);
+        }
+
+        //创建灯光
+        function initLight() {
+            light = new THREE.DirectionalLight(0xffffff); //添加了一个白色的平行光
+            scene.add(light); //添加到场景
+
+            //添加一个全局环境光
+            scene.add(new THREE.AmbientLight(0x222222));
+        }
+
+
+        //创建模型
+        function initMesh() {
+
+
+            var geometry = new THREE.BoxGeometry(2, 2, 2); //创建几何体
+            var material = new THREE.MeshBasicMaterial(); //创建材质
+            var texture = new THREE.TextureLoader().load("./test.png");
+            material.map = texture
+            // texture.wrapS = THREE.MirroredRepeatWrapping
+            // texture.wrapT = THREE.RepeatWrapping
+            // texture.repeat.set( 2, 2 )
+            mesh = new THREE.Mesh(geometry, material); //创建网格
+            scene.add(mesh); //将网格添加到场景
+
+            var geometry2 = new THREE.SphereGeometry(1.5, 32, 32);
+            var material2 = new THREE.MeshStandardMaterial({color:0x00ffff});
+            material2.metalness = 0//设置的值的范围为0-1，值越小，材质越光滑，高光越明显
+            // material2.metalnessMap = 0.8
+            circle = new THREE.Mesh(geometry2, material2);
+            scene.add(circle);
+            circle.position.set(4, 0, 0)
+
+            var geometry3 = new THREE.ConeGeometry(1.5, 2.5, 32);
+            var material3 = new THREE.MeshNormalMaterial();
+            cone = new THREE.Mesh(geometry3, material3);
+            scene.add(cone);
+            cone.position.set(-4, 0, 0)
+
+            var geometry4 = new THREE.CylinderGeometry(1, 1, 2, 32);
+            var material4 = new THREE.MeshLambertMaterial({color:0x00ffff});
+            cylinder = new THREE.Mesh(geometry4, material4);
+            scene.add(cylinder);
+            material4.opacity = 0.5
+            cylinder.position.set(0, 4, 0)
+
+            var geometry5 = new THREE.TorusGeometry(1.5, 0.5, 16, 100);
+            var material5 = new THREE.MeshPhongMaterial({color:0x00ffff});
+            torus = new THREE.Mesh(geometry5, material5);
+
+            // material5.wireframe = true //显示网格
+            scene.add(torus);
+            torus.position.set(0, -4, 0)
+
+
+
+            geometry3.computeBoundingBox()
+            console.log(geometry3.boundingBox)
+
+            // mesh.visible = false //隐藏mesh
+            // scene.remove(mesh); //删除mesh
+
+            // console.log(scene.children);
+            // console.log(mesh.parent);
+
+            // mesh.scale.x = 2; //模型沿x轴放大一倍
+            // mesh.scale.y = 0.5; //模型沿y轴缩小一倍
+            // mesh.scale.z = 1; //模型沿z轴保持不变
+        }
+
+        //运行动画
+        function animate() {
+            requestAnimationFrame(animate); //循环调用函数
+
+            //鼠标控制
+            // document.body.onmousedown = addEvent
+            // document.body.onmouseup = removeEvent
+
+            // mesh.rotation.x += 0.01; //每帧网格模型的沿x轴旋转0.01弧度
+            // mesh.rotation.y += 0.02; //每帧网格模型的沿y轴旋转0.02弧度
+
+            stats.update(); //更新性能插件
+
+            renderer.render(scene, camera); //渲染界面
+        }
+
+        function init() {
+            initRenderer();
+            initScene();
+            initCamera();
+            initMesh();
+            initLight();
+            animate();
+        }
+
+
+
+        //实例化dat.GUI对象，将需要修改的配置添加对象中，并监听变化回调
+        var gui = new dat.GUI();
+        //创建一个对象，包含需要改变的量
+        var controls = {
+            positionX: 0,
+            positionY: 0,
+            positionZ: 0,
+            rotationX: 0,
+            rotationY: 0,
+            rotationZ: 0,
+            lightX:10,
+            lightY:10,
+            lightZ:0,
+            cameraX:0,
+            cameraY:0,
+            cameraZ:15,
+            // cameraRX:0,
+            // cameraRY:0,
+            // cameraRZ:0,
+        };
+        //分组
+        var meshPosition = gui.addFolder("位置")
+        var meshRotation = gui.addFolder("选择")
+        var lightPosition = gui.addFolder("灯光")
+        var cameraControls = gui.addFolder("相机")
+        //添加控制器
+        meshPosition.add(controls, "positionX", -10, 10).onChange(updatePosition);
+        meshPosition.add(controls, "positionY", -10, 10).onChange(updatePosition);
+        meshPosition.add(controls, "positionZ", -10, 10).onChange(updatePosition);
+        meshRotation.add(controls, "rotationX", 0, 2 * Math.PI).onChange(updatePosition);
+        meshRotation.add(controls, "rotationY", 0, 2 * Math.PI).onChange(updatePosition);
+        meshRotation.add(controls, "rotationZ", 0, 2 * Math.PI).onChange(updatePosition);
+        lightPosition.add(controls, "lightX", -20,20).onChange(updatePosition);
+        lightPosition.add(controls, "lightY", -20,20).onChange(updatePosition);
+        lightPosition.add(controls, "lightZ", -20,20).onChange(updatePosition);
+        cameraControls.add(controls, "cameraX", -20,20).onChange(updatePosition);
+        cameraControls.add(controls, "cameraY", -20,20).onChange(updatePosition);
+        cameraControls.add(controls, "cameraZ", 0,200).onChange(updatePosition);
+        // cameraControls.add(controls, "cameraRX", 0,4).step(0.01).onChange(updatePosition);
+        // cameraControls.add(controls, "cameraRY", 0,4).step(0.01).onChange(updatePosition);
+        // cameraControls.add(controls, "cameraRZ", 0,4).step(0.01).onChange(updatePosition);
+        
+        meshPosition.open()//展开
+        meshRotation.open()
+        lightPosition.open()
+        cameraControls.open()
+        //触发的函数
+        function updatePosition() {
+            mesh.position.set(controls.positionX, controls.positionY, controls.positionZ);
+            mesh.rotation.set(controls.rotationX, controls.rotationY, controls.rotationZ);
+            // torus.position.set(controls.positionX, controls.positionY, controls.positionZ);
+            torus.rotation.set(controls.rotationX, controls.rotationY, controls.rotationZ);
+            circle.rotation.set(controls.rotationX, controls.rotationY, controls.rotationZ);
+            cone.rotation.set(controls.rotationX, controls.rotationY, controls.rotationZ);
+            cylinder.rotation.set(controls.rotationX, controls.rotationY, controls.rotationZ);
+            light.position.set(controls.lightX, controls.lightY, controls.lightZ)
+            camera.position.set(controls.cameraX, controls.cameraY, controls.cameraZ)
+            // camera.rotation.set(controls.cameraRX, controls.cameraRY, controls.cameraRZ)
+        }
+
+
+        //鼠标控制
+        var startX = 0
+        var startY = 0
+        function meshMove(e) {
+            mesh.rotation.y = -(e.offsetX - startX) / 100
+            mesh.rotation.x = (e.offsetY - startX) / 100
+        }
+        function addEvent(e) {
+            startX = e.offsetX
+            startY = e.offsetY
+            document.body.addEventListener("mousemove", meshMove, false)
+        }
+        function removeEvent() {
+            document.body.removeEventListener("mousemove", meshMove, false)
+        }
+
+
+    </script>
+</body>
+
+</html>

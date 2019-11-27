@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style type="text/css">
+        div#canvas-frame {
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            height: 600px;
+            background-color: #EEEEEE;
+        }
+    </style>
+</head>
+
+<body onload="init()">
+
+    <!-- cdn three.js -->
+    <script src="./js/three.js"></script>
+    <!-- cdn 性能检测器 -->
+    <script src="http://www.wjceo.com/lib/js/libs/stats.min.js"></script>
+    <!-- cdn dat.GUI插件 -->
+    <script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
+
+    <script src="./controls/FirstPersonControls.js"></script>
+
+
+    <!-- 引入格式Loader -->
+    <script src="./loader/OBJLoader.js"></script>
+    <script src="./loader/MTLLoader.js"></script>
+    <script src="./loader/GLTFLoader.js"></script>
+
+
+    <script>
+        //声明一些全局变量
+        var renderer, camera, scene, light, pointLight, spotLight, group
+
+        THREE.BackSide
+
+        //声明调用性能检测插件
+        var stats = new Stats();
+        document.body.appendChild(stats.dom);
+
+
+
+        //初始化渲染器
+        function initRenderer() {
+            renderer = new THREE.WebGLRenderer(); //实例化渲染器
+            renderer.setSize(window.innerWidth, window.innerHeight); //设置宽和高
+            renderer.shadowMap.enabled = true;//渲染阴影
+            document.body.appendChild(renderer.domElement); //添加到dom
+
+        }
+
+        //初始化场景
+        function initScene() {
+            scene = new THREE.Scene(); //实例化场景
+            // scene.rotation.set(Math.PI*20/180,0,0)
+        }
+
+        //初始化相机
+        function initCamera() {
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000); //实例化相机
+            camera.position.set(300,200,650);
+            camera.lookAt(new THREE.Vector3(300, 200, ))
+
+        }
+
+
+
+        //创建灯光
+        function initLight() {
+            //添加一个全局环境光
+            scene.add(new THREE.AmbientLight(0x222222, 1));
+
+            //点光源
+            pointLight = new THREE.PointLight(0xffffff, 0.5)
+            pointLight.position.set(300,200,470)
+            scene.add(pointLight)
+
+        }
+
+        var table, testBox
+
+        //创建MTL加载器
+        var mtlLoader = new THREE.MTLLoader();
+
+        var objLoader = new THREE.OBJLoader();
+        //设置当前加载的纹理
+        // objLoader.setMaterials(material);
+        objLoader.setPath('./obj/');
+        objLoader.load('t929.obj', function (object) {
+            //添加阴影
+            object.traverse(function (item) {
+                if (item instanceof THREE.Mesh) {
+                    item.castShadow = true;
+                    item.receiveShadow = true;
+                }
+            });
+            //缩放
+            object.position.set(0, 0, 0)
+            object.scale.set(1, 1, 1);
+            
+            console.log(object.children)
+            scene.add(object);
+        })
+
+
+        //创建模型
+        function initMesh() {
+
+            group = new THREE.Group()
+
+            var tableGeometry = new THREE.BoxGeometry(10, 0.1, 10)
+            var tableMaterial = new THREE.MeshLambertMaterial()
+            // var tableMaterial = new THREE.MeshNormalMaterial()
+            tableMaterial.color = new THREE.Color("white")
+            table = new THREE.Mesh(tableGeometry, tableMaterial)
+            group.add(table)
+            table.receiveShadow = true //开启接受阴影投射
+
+            var testBoxGeometry = new THREE.BoxGeometry(2, 2, 2)
+            var testBoxMaterial = new THREE.MeshLambertMaterial()
+            testBoxMaterial.color = new THREE.Color("red")
+            testBox = new THREE.Mesh(testBoxGeometry, testBoxMaterial)
+            group.add(testBox)
+            testBox.position.set(0, 1.05, 0)
+            testBox.castShadow = true //开启阴影
+
+
+
+
+            scene.add(group)
+        }
+
+        var controls;
+        function initControls() {
+            console.log(camera)
+            controls = new THREE.FirstPersonControls(camera);
+            controls.lookSpeed = 0.1; //鼠标移动查看的速度
+            controls.movementSpeed = 100; //相机移动速度
+            controls.noFly = true;
+            controls.constrainVertical = true; //约束垂直
+            controls.verticalMin = 1.0;
+            controls.verticalMax = 2.0;
+            controls.lon = Math.PI; //进入初始视角x轴的角度
+            controls.lat = Math.PI * 50 / 180; //初始视角进入后y轴的角度
+        }
+
+        function render() {
+
+            renderer.clear();
+            renderer.render(scene, camera);
+        }
+
+        var clock = new THREE.Clock();
+
+        //运行动画
+        function animate() {
+            render();
+            stats.update();
+
+            controls.update(clock.getDelta());
+            requestAnimationFrame(animate); //循环调用函数
+
+            //鼠标控制
+            // document.body.onmousedown = addEvent
+            // document.body.onmouseup = removeEvent
+
+            // group.rotation.y +=0.01
+
+            stats.update(); //更新性能插件
+
+            renderer.render(scene, camera); //渲染界面
+        }
+
+
+        function init() {
+            initRenderer();
+            initScene();
+            initCamera();
+            initMesh();
+            initLight();
+            initControls();
+            animate();
+        }
+
+
+
+        //实例化dat.GUI对象，将需要修改的配置添加对象中，并监听变化回调
+        // var gui = new dat.GUI();
+        // //创建一个对象，包含需要改变的量
+        // var controls = {
+        //     lightX : 100,
+        //     lightY : 150,
+        //     lightZ : 200,
+        // };
+        // //分组
+        // gui.add(controls,"lightX",0,1000).step(20).onChange(updateDate)
+        // gui.add(controls,"lightY",0,1000).step(20).onChange(updateDate)
+        // gui.add(controls,"lightZ",0,1000).step(20).onChange(updateDate)
+        // //触发的函数
+        // function updateDate() {
+        //     pointLight.position.set = (controls.lightX,controls.lightY,controls.lightZ)
+        // }
+
+
+    </script>
+</body>
+
+</html>
