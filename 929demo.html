@@ -72,7 +72,7 @@
 
 
         //声明一些全局变量
-        var renderer, mycamera, scene, light, stats, spotLight ,clockBtn
+        var renderer, mycamera, scene, light, stats, spotLight
         var modelBox = document.getElementsByClassName("modelBox")[0]
         var btn = document.getElementsByClassName("btn")[0]
         console.log(modelBox.offsetWidth)
@@ -129,12 +129,15 @@
 
         }
 
-
+        var wall1, wall2, wall3, wall4, clockBtn
+        var leftMaterials = [];
+        var rightMaterials = [];
+        var midMaterials = [];
+        var materialAnime, material1
         //创建模型
         function initMesh() {
             //创建MTL加载器
             var objLoader = new THREE.OBJLoader();
-            var materialAnime, material1
             //设置当前加载的纹理
             // objLoader.setMaterials(material);
             objLoader.setPath('./obj/');
@@ -160,11 +163,6 @@
                 object.scale.set(0.09, 0.09, 0.09);
                 scene.add(object);
             })
-
-            var wall1, wall2, wall3, wall4, clockBtn
-            var leftMaterials = [];
-            var rightMaterials = [];
-            var midMaterials = [];
 
             for (let i = 0; i < 6; i++) {
                 leftMaterials[i] = new THREE.MeshLambertMaterial({ color: 'grey' })
