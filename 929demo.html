@@ -34,22 +34,16 @@
 
 
 <body onload="init()">
-    <video id="video1" muted webkit-playsinline="true" 
-    playsinline="false" 
-    x5-video-player-type="h5" 
-    x5-video-player-fullscreen="false" >
+    <video id="video1" muted webkit-playsinline="true" playsinline="false" x5-video-player-type="h5"
+        x5-video-player-fullscreen="false">
         <source src="./static/粒子向左.mp4">
     </video>
-    <video id="video2" muted webkit-playsinline="true" 
-    playsinline="false" 
-    x5-video-player-type="h5" 
-    x5-video-player-fullscreen="false">
+    <video id="video2" muted webkit-playsinline="true" playsinline="false" x5-video-player-type="h5"
+        x5-video-player-fullscreen="false">
         <source src="./static/粒子向右.mp4">
     </video>
-    <video id="video3" muted webkit-playsinline="true" 
-    playsinline="false" 
-    x5-video-player-type="h5" 
-    x5-video-player-fullscreen="false">
+    <video id="video3" muted webkit-playsinline="true" playsinline="false" x5-video-player-type="h5"
+        x5-video-player-fullscreen="false">
         <source src="./static/时钟20s.mp4">
     </video>
 
@@ -135,48 +129,48 @@
 
         }
 
-        //创建MTL加载器
-        var objLoader = new THREE.OBJLoader();
-        var materialAnime
-        //设置当前加载的纹理
-        // objLoader.setMaterials(material);
-        objLoader.setPath('./obj/');
-        objLoader.load('929-边.obj', function (object) {
 
-            //缩放
-            materialAnime = new THREE.MeshBasicMaterial({ color: "black" })
-            object.children[0].material = materialAnime
-
-
-            object.position.set(-32.5, -15.5, 1)
-            object.scale.set(0.09, 0.09, 0.09);
-
-            scene.add(object);
-        })
-        var objLoader2 = new THREE.OBJLoader();
-        objLoader2.setPath('./obj/');
-        objLoader2.load('929-体块.obj', function (object) {
-            //缩放
-            var material1 = new THREE.MeshLambertMaterial({ color: "#020202" })
-            object.children[0].material = material1
-            object.position.set(-32.5, -15.5, 1)
-            object.scale.set(0.09, 0.09, 0.09);
-            scene.add(object);
-        })
-
-        var wall1, wall2, wall3, wall4, clockBtn
-        var leftMaterials = [];
-        var rightMaterials = [];
-        var midMaterials = [];
-
-        for (let i = 0; i < 6; i++) {
-            leftMaterials[i] = new THREE.MeshLambertMaterial({ color: 'grey' })
-            rightMaterials[i] = new THREE.MeshLambertMaterial({ color: 'grey' })
-            midMaterials[i] = new THREE.MeshLambertMaterial({ color: 'grey' })
-        }
         //创建模型
         function initMesh() {
+            //创建MTL加载器
+            var objLoader = new THREE.OBJLoader();
+            var materialAnime, material1
+            //设置当前加载的纹理
+            // objLoader.setMaterials(material);
+            objLoader.setPath('./obj/');
+            objLoader.load('929-边.obj', function (object) {
 
+                //缩放
+                materialAnime = new THREE.MeshBasicMaterial({ color: "black" })
+                object.children[0].material = materialAnime
+
+
+                object.position.set(-32.5, -15.5, 1)
+                object.scale.set(0.09, 0.09, 0.09);
+
+                scene.add(object);
+            })
+            var objLoader2 = new THREE.OBJLoader();
+            objLoader2.setPath('./obj/');
+            objLoader2.load('929-体块.obj', function (object) {
+                //缩放
+                material1 = new THREE.MeshLambertMaterial({ color: "#020202" })
+                object.children[0].material = material1
+                object.position.set(-32.5, -15.5, 1)
+                object.scale.set(0.09, 0.09, 0.09);
+                scene.add(object);
+            })
+
+            var wall1, wall2, wall3, wall4, clockBtn
+            var leftMaterials = [];
+            var rightMaterials = [];
+            var midMaterials = [];
+
+            for (let i = 0; i < 6; i++) {
+                leftMaterials[i] = new THREE.MeshLambertMaterial({ color: 'grey' })
+                rightMaterials[i] = new THREE.MeshLambertMaterial({ color: 'grey' })
+                midMaterials[i] = new THREE.MeshLambertMaterial({ color: 'grey' })
+            }
 
             var geometry = new THREE.BoxGeometry(65, 32, 2); //创建几何体
 
@@ -267,11 +261,11 @@
         }
 
         document.onmousedown = onDocumentMouseDown
-        document.ontouchstart =function(){
+        document.ontouchstart = function () {
             var videoArr = [video1, video2, video3]
-                for (let i of videoArr) {
-                    i.play()
-                }
+            for (let i of videoArr) {
+                i.play()
+            }
         }
 
         //创建控制器
@@ -308,7 +302,7 @@
             renderer.render(scene, mycamera);
         }
 
-        
+
         function onWindowResize() {
             mycamera.aspect = window.innerWidth / window.innerHeight;
             mycamera.updateProjectionMatrix();
