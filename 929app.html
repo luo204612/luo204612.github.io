@@ -55,9 +55,11 @@
     <!-- TweenMax 插针动画插件 -->
     <script src="./js/TweenMax.min.js"> </script>
     <!-- 控制器引入 -->
+    <script src="./controls/DeviceOrientationControls.js"></script>
+    <script src="./js/stats.min.js"></script>
+    <script src="./js/dat.gui.min.js"></script>
     <!-- 引入格式Loader -->
     <script src="./loader/OBJLoader.js"></script>
-    <script src="https://cdn.bootcss.com/dat-gui/0.7.1/dat.gui.min.js"></script>
 
 
     <script>
@@ -82,6 +84,19 @@
             mycamera = new THREE.PerspectiveCamera(45, modelBox.clientWidth / modelBox.clientHeight, 1, 1000); //实例化相机
             mycamera.position.set(0, -3, 90); //相机初始位置
             mycamera.lookAt(new THREE.Vector3(-10, 2, 0)) //相机朝向
+        }
+
+        function initGui() {
+            //声明一个保存需求修改的相关数据的对象
+            gui = {
+                enabled: true
+            };
+
+            var datGui = new dat.GUI();
+            //将设置属性添加到gui当中，gui.add(对象，属性，最小值，最大值）
+            datGui.add(gui, "enabled").name("开启控制器").onChange(function (e) {
+                control.enabled = e;
+            })
         }
 
         //创建灯光
@@ -264,6 +279,26 @@
         document.onmousedown = onDocumentMouseDown
         document.ontouchstart = meshAnimate
 
+        function initStats() {
+            stats = new Stats();
+            document.body.appendChild(stats.dom);
+        }
+
+        function initControl() {
+
+            control = new THREE.DeviceOrientationControls(mycamera);
+
+            // 是否开启当前的控制器 默认值为true
+            control.enabled = true;
+        }
+
+        function render() {
+
+            control.update();
+
+            renderer.render(scene, mycamera);
+        }
+
         function onWindowResize() {
             modelBox.style.height = window.innerHeight
             modelBox.style.width = window.innerWidth
@@ -274,6 +309,7 @@
 
         function animate() {
             renderer.clear();
+            render();
             requestAnimationFrame(animate); //循环调用函数
             spotLightHelper.update(); //更新光照辅助
             renderer.render(scene, mycamera); //渲染界面
@@ -282,13 +318,17 @@
 
 
         function init() {
-            initRenderer();
+            initGui();
+            initRender();
             initScene();
-            initmycamera();
-            initMesh();
+            initCamera();
             initLight();
-            initPlugin()
-            animate()
+            initModel();
+            initStats();
+
+            initControl();
+
+            animate();
             window.onresize = onWindowResize;
         }
 
