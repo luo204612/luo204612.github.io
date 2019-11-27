@@ -28,13 +28,6 @@
             opacity: 0;
             height: 0;
         }
-
-        #textBox {
-            position: fixed;
-            top: 60px;
-            left: 10px;
-            color: white;
-        }
     </style>
 </head>
 
@@ -57,7 +50,6 @@
 
     <div class="modelBox">
     </div>
-    <div id="textBox">让视频加载一会可以开启陀螺仪看看</div>
 
     <script src="./js/three.min.js"></script>
     <!-- TweenMax 插针动画插件 -->
@@ -77,9 +69,7 @@
         modelBox.style.height = window.innerHeight
         modelBox.style.width = window.innerWidth
 
-        var video1 = document.getElementById('video1');
-        var video2 = document.getElementById('video2');
-        var video3 = document.getElementById('video3');
+
 
         //初始化渲染器
         function initRenderer() {
@@ -117,7 +107,7 @@
         //创建灯光
         function initLight() {
             //添加一个全局环境光
-            scene.add(new THREE.AmbientLight(0x222222, 2));
+            scene.add(new THREE.AmbientLight(0x222222, 1));
             spotLight = new THREE.SpotLight(0xffffff); //创建一个白色光照
             spotLight.position.set(10, 15, 100)
             spotLight.intensity = 15; //修改光的强度
@@ -183,11 +173,16 @@
             }
 
             var geometry = new THREE.BoxGeometry(65, 32, 2); //创建几何体
-            var leftTexture = new THREE.VideoTexture(video1);
+
+            var left = document.getElementById('video1');
+            var leftTexture = new THREE.VideoTexture(left);
             leftMaterials[4].map = leftTexture
-            var rightTexture = new THREE.VideoTexture(video2);
+            var right = document.getElementById('video2');
+            var rightTexture = new THREE.VideoTexture(right);
             rightMaterials[4].map = rightTexture
-            var midTexture = new THREE.VideoTexture(video3);
+
+            var mid = document.getElementById('video3');
+            var midTexture = new THREE.VideoTexture(mid);
             midMaterials[4].map = midTexture
 
             wall1 = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(leftMaterials)); //创建网格
@@ -256,14 +251,9 @@
                 }
             }, 20000)
         }
-        setTimeout(() => {
-            textBox.innerHTML = "现在点击试试能不能播放"
-            document.ontouchstart = meshAnimate
-        }, 10000);
 
 
-
-
+        document.ontouchstart = meshAnimate
 
         function initStats() {
             stats = new Stats();
