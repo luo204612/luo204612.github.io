@@ -57,7 +57,7 @@
 
     <div class="modelBox">
     </div>
-    <div id="textBox">让视频加载一会</div>
+    <div id="textBox">让视频加载一会可以开启陀螺仪看看</div>
 
     <script src="./js/three.min.js"></script>
     <!-- TweenMax 插针动画插件 -->
@@ -117,7 +117,7 @@
         //创建灯光
         function initLight() {
             //添加一个全局环境光
-            scene.add(new THREE.AmbientLight(0x222222, 1));
+            scene.add(new THREE.AmbientLight(0x222222, 2));
             spotLight = new THREE.SpotLight(0xffffff); //创建一个白色光照
             spotLight.position.set(10, 15, 100)
             spotLight.intensity = 15; //修改光的强度
@@ -256,11 +256,11 @@
                 }
             }, 20000)
         }
-
-        document.setTimeout(function () {
+        setTimeout(() => {
             textBox.innerHTML = "现在点击试试能不能播放"
             document.ontouchstart = meshAnimate
-        }, 5000)
+        }, 10000);
+
 
 
 
