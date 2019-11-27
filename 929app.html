@@ -66,6 +66,8 @@
         //声明一些全局变量
         var renderer, mycamera, scene, light, stats, spotLight, materialAnime
         var modelBox = document.getElementsByClassName("modelBox")[0]
+        modelBox.style.height = window.innerHeight
+        modelBox.style.width = window.innerWidth
         //初始化渲染器
         function initRenderer() {
             renderer = new THREE.WebGLRenderer({ alpha: false, antialias: true, }); //实例化渲染器
