@@ -28,7 +28,8 @@
             opacity: 0;
             height: 0;
         }
-        #textBox{
+
+        #textBox {
             position: fixed;
             top: 60px;
             left: 10px;
@@ -56,7 +57,7 @@
 
     <div class="modelBox">
     </div>
-    <div id="textBox">视频加载中……</div>
+    <div id="textBox">让视频加载一会</div>
 
     <script src="./js/three.min.js"></script>
     <!-- TweenMax 插针动画插件 -->
@@ -76,7 +77,9 @@
         modelBox.style.height = window.innerHeight
         modelBox.style.width = window.innerWidth
 
-
+        var video1 = document.getElementById('video1');
+        var video2 = document.getElementById('video2');
+        var video3 = document.getElementById('video3');
 
         //初始化渲染器
         function initRenderer() {
@@ -180,16 +183,11 @@
             }
 
             var geometry = new THREE.BoxGeometry(65, 32, 2); //创建几何体
-
-            var left = document.getElementById('video1');
-            var leftTexture = new THREE.VideoTexture(left);
+            var leftTexture = new THREE.VideoTexture(video1);
             leftMaterials[4].map = leftTexture
-            var right = document.getElementById('video2');
-            var rightTexture = new THREE.VideoTexture(right);
+            var rightTexture = new THREE.VideoTexture(video2);
             rightMaterials[4].map = rightTexture
-
-            var mid = document.getElementById('video3');
-            var midTexture = new THREE.VideoTexture(mid);
+            var midTexture = new THREE.VideoTexture(video3);
             midMaterials[4].map = midTexture
 
             wall1 = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(leftMaterials)); //创建网格
@@ -259,10 +257,11 @@
             }, 20000)
         }
 
-        video3.addEventListener('canplaythrough', function () {
-            textBox.innerHTML = "视频加载完毕，点击屏幕观看"
+        document.setTimeout(function () {
+            textBox.innerHTML = "现在点击试试能不能播放"
             document.ontouchstart = meshAnimate
-        });
+        }, 5000)
+
 
 
 
