@@ -28,6 +28,12 @@
             opacity: 0;
             height: 0;
         }
+        #textBox{
+            position: fixed;
+            top: 60px;
+            left: 10px;
+            color: white;
+        }
     </style>
 </head>
 
@@ -50,6 +56,7 @@
 
     <div class="modelBox">
     </div>
+    <div id="textBox">视频加载中……</div>
 
     <script src="./js/three.min.js"></script>
     <!-- TweenMax 插针动画插件 -->
@@ -68,6 +75,9 @@
         var modelBox = document.getElementsByClassName("modelBox")[0]
         modelBox.style.height = window.innerHeight
         modelBox.style.width = window.innerWidth
+
+
+
         //初始化渲染器
         function initRenderer() {
             renderer = new THREE.WebGLRenderer({ alpha: false, antialias: true, }); //实例化渲染器
@@ -249,7 +259,12 @@
             }, 20000)
         }
 
-        document.ontouchstart = meshAnimate
+        video3.addEventListener('canplaythrough', function () {
+            textBox.innerHTML = "视频加载完毕，点击屏幕观看"
+            document.ontouchstart = meshAnimate
+        });
+
+
 
         function initStats() {
             stats = new Stats();
