@@ -89,7 +89,7 @@
         function initGui() {
             //声明一个保存需求修改的相关数据的对象
             gui = {
-                enabled: true
+                enabled: false
             };
 
             var datGui = new dat.GUI();
@@ -289,7 +289,7 @@
             control = new THREE.DeviceOrientationControls(mycamera);
 
             // 是否开启当前的控制器 默认值为true
-            control.enabled = true;
+            control.enabled = false;
         }
 
         function render() {
@@ -319,11 +319,11 @@
 
         function init() {
             initGui();
-            initRender();
+            initRenderer();
             initScene();
-            initCamera();
+            initmycamera();
             initLight();
-            initModel();
+            initMesh();
             initStats();
 
             initControl();
